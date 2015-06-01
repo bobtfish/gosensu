@@ -25,11 +25,18 @@ func (s *Sensu) GetEventsCheckForClient(client string, check string) ([]interfac
 }
 
 // ResolveEvent delete an event
-func (s *Sensu) ResolveEvent(payload interface{}) (map[string]interface{}, error) {
+func (s *Sensu) ResolveEvent(client string, check string) (map[string]interface{}, error) {
 	//	return s.post(fmt.Sprintf("stashes/create"), payload)
+	payload := struct {
+		Client string
+		Check  string
+	}{
+		client,
+		check,
+	}
 	payloadstr, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("Stash parsing error: %q returned: %v", err, err)
+		return nil, fmt.Errorf("Marshal: %q returned: %v", err, err)
 	}
-	return s.postPayload("resolve", string(payloadstr[:]))
+	return s.postPayload("event/resolve", string(payloadstr[:]))
 }
